@@ -1,0 +1,47 @@
+name: Build, Push to ECR, and Deploy to EKS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: self-hosted
+      
+    
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t sample-app .
+          docker tag sample-app:latest ${{ secrets.ECR_REPOSITORY }}:test
+          docker push ${{ secrets.ECR_REPOSITORY }}:test
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name Gitops-Demo-Cluster
+
+      - name: Debug Kubernetes Config
+        run: kubectl config view
+
+      - name: Deploy to EKS
+        run: |
+          kubectl version --client
+          kubectl get nodes
+          kubectl apply -f K8s/deployment.yaml
