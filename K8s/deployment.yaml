@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: sample-app
-        image: 969682547877.dkr.ecr.ap-south-1.amazonaws.com/eks-git:latest
+        image: 969682547877.dkr.ecr.ap-south-1.amazonaws.com/eks-git:v2
         ports:
         - containerPort: 3000
