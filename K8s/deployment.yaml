@@ -4,7 +4,7 @@ metadata:
   name: sample-app1
   namespace: demo
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: sample-app
@@ -14,7 +14,7 @@ spec:
         app: sample-app
     spec:
       containers:
-      - name: sample-app
+      - name: hello-world
         image: 969682547877.dkr.ecr.ap-south-1.amazonaws.com/eks-git:v6
         ports:
         - containerPort: 3000
